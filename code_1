@@ -1,0 +1,271 @@
+#include<iostream>
+#include<conio.h>
+#include<cstdlib>
+#include<string>
+using namespace std;
+class library
+{
+private:
+	int isdn[20], av[20],r=0,reg=0,match,k;
+	string name[20];
+	string entry;
+	static int count;
+public:
+	void show_list()
+	{
+		if (count == 0)
+			cout << "no books uploaded yet \n";
+		cout << "library look up table \n"<<endl<<endl<<endl;
+		cout << "isdn \t" <<"\t"<<"name\t "<< "\t" <<"available \n";
+		for (int i = 0;i < count;i++)
+		{
+			cout << isdn[i] << "\t"<<"\t" <<name[i]<<"\t"<<"\t"<< av[i];
+			cout << endl;
+		}
+	}
+	friend class admin;
+	friend class student;
+	void load_books()
+	{
+		int n;
+		cout << "enter no. of books to load : ";
+		cin >> n;
+		cout<<endl;
+		for (int i = 0;i < n;i++)
+		{
+			cout << "enter isdn : ";
+			cin >> isdn[i];
+			cout << endl;
+			cout << "enter name: ";
+			cin >> name[i];
+			cout<<endl;
+			cout << "enter no. of books : ";
+			cin >> av[i];
+			cout << endl;
+			count++;
+		}
+	}
+	void refresh()
+	{
+		system("CLS");
+		cout<< "################ LIBRARY  ################" << endl << endl << endl;
+	}
+	void search_name()
+	{
+
+	    cout<<"enter the book name \n";
+	    cin>>entry;
+        cout<<"this could be the possible book \n";
+        cout << "isdn \t" <<"\t"<<"name\t "<< "\t" <<"available \n";
+        cout<<endl;
+	    for(int i=0;i<count;i++)
+        {
+
+            for(int j=0;j<entry.length();j++)
+           {
+
+               if(name[i][j]==entry[j])
+               {
+                   r++;
+
+               }
+               if(r>=3)
+               {
+                  r=0;
+                  k=i;
+                  reg=1;
+                  break;
+               }
+           }
+           if(reg==1)
+           {
+               cout << isdn[k] << "\t"<<"\t" <<name[k]<<"\t"<<"\t"<< av[k];
+               cout<<endl;
+               cout<<endl;
+               reg=0;
+
+           }
+
+           }
+	}
+};
+int library::count = 0;
+
+class admin
+{
+private:
+	int c, x, pwd ;
+public:
+	void update(library &l1)
+	{
+		cout << "u r in update library section \n";
+		cout << "enter the isdn no. ";
+		cin >> c;
+		cout << "\n";
+		for (int i = 0;i < 20;i++)
+		{
+			if (l1.isdn[i] == c)
+			{
+				cout << "isdn match found \n";
+				cout << "update the available book no. \n";
+				cin >> x;
+				l1.av[i] = x;
+				break;
+
+			}
+
+		}
+	}
+	int get_pwd()
+	{
+		cout << "enter ur password \n";
+		cin >> pwd;
+		if (pwd == 1234)
+		{
+				return 1;
+		}
+		else
+			return 0;
+
+
+
+	}
+
+};
+class student
+
+{
+private:
+	int c;
+public:
+	void borrow(library &l1)
+	{
+		cout << "enter isdn of the book to borrow\n";
+		cin >> c;
+		for (int i = 0;i <=l1.count;i++)
+		{
+			if (l1.isdn[i] == c)
+			{
+				if (l1.av[i] > 0)
+				{
+					cout << "book is available to borrow \n";
+					cout<<"thank u for borrowing!!! \n";
+					l1.av[i]--;
+					break;
+				}
+				else
+				{
+					cout << "sorry the book is unavailable \n";
+					break;
+				}
+			}
+		}
+	}
+	void ret_back(library &l1)
+	{
+		cout << "enter isdn of the book to return\n";
+		cin >> c;
+		for (int i = 0;i <= l1.count;i++)
+		{
+			if (l1.isdn[i] == c)
+			{
+				if (l1.av[i] > 0)
+				{
+					cout << "book is available to borrow \n";
+					l1.av[i]++;
+					break;
+				}
+				else
+				{
+					cout << "sorry the book is unavailable \n";
+					break;
+				}
+
+
+			}
+		}
+	}
+
+};
+int main()
+{
+	cout << "################ LIBRARY  ################" << endl<<endl<<endl;
+	library l1;
+	admin a1;
+	student s1;
+	int c,ch,x;
+	l1.load_books();
+	l1.refresh();
+	while (1)
+	{
+		cout << "enter ur choice : \n";
+		cout << "1.list of books \n";
+		cout << "2.admin access \n";
+		cout << "3.student access \n";
+		cout << "4.exit \n";
+		cin >> c;
+		switch (c)
+		{
+		case 1:
+			l1.refresh();
+			l1.show_list();
+			break;
+		case 2:
+			l1.refresh();
+			if (a1.get_pwd() == 1)
+			{
+				cout << "access granted \n";
+				l1.refresh();
+				l1.show_list();
+				a1.update(l1);
+			}
+			else
+			{
+				cout << "wrong password \n";
+				l1.refresh();
+			}
+			break;
+		case 3:
+			l1.refresh();
+			cout<<"enter ur choice to select the mode of searching books \n";
+			cout<<"1.search by look up table \n"<<"2.search by name \n";
+			cin>>ch;
+			if(ch==1)
+                l1.show_list();
+            else if(ch==2)
+                l1.search_name();
+            else
+                cout<<"invalid input \n";
+			cout << "enter ur choice \n";
+			cout << "1.borrow \n" << "2.return \n" << "3.exit \n";
+			cin >> ch;
+			if (ch == 1)
+				s1.borrow(l1);
+			else if (ch == 2)
+				s1.ret_back(l1);
+			else
+				l1.refresh();
+			break;
+
+		case 4:
+			cout << "thank you!!!! \n";
+			l1.refresh();
+			break;
+		default:
+			cout << "thank you!!!! \n";
+			l1.refresh();
+			break;
+
+
+		}
+		cout << "press 37 if u want to exit the application completely and any digit key to continue \n";
+		cin >> x;
+		if (x == 37)
+			break;
+		else
+			l1.refresh();
+
+	}
+
+	return 0;
+}
